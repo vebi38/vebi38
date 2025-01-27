@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Wars Info</title>
+    <link rel="stylesheet" href="app.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="https://windybot.com/img/rIl5C6zCSjsc2GKMtYbi.jpg" alt="Darth Vader Dark" class="Darth Vader Dark">
+            <h1>Star Wars Info</h1>
+        </header>
+
+        <section>
+            <h2>People Info</h2>
+            <table id="peopleTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Height (cm)</th>
+                        <th>Mass (kg)</th>
+                        <th>Gender</th>
+                        <th>Birth Year</th>
+                        <th>Appearances</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" style="text-align: center;">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Ships Info</h2>
+            <table id="shipsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Model</th>
+                        <th>Manufacturer</th>
+                        <th>Cost (credits)</th>
+                        <th>Crew</th>
+                        <th>Passengers</th>
+                        <th>Class</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="text-align: center;">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <script>
+        async function fetchPeople() {
+            const peopleTableBody = document.querySelector("#peopleTable tbody");
+            peopleTableBody.innerHTML = ""; // Clear loading state
+
+            try {
+                let url = 'https://swapi.dev/api/people/';
+                while (url) {
+                    const response = await axios.get(url);
+                    const people = response.data.results;
+
+                    people.forEach(person => {
+                        const appearances = person.films.length;
+                        const row = `<tr>
+                            <td>${person.name}</td>
+                            <td>${person.height}</td>
+                            <td>${person.mass}</td>
+                            <td>${person.gender}</td>
+                            <td>${person.birth_year}</td>
+                            <td>${appearances}</td>
+                        </tr>`;
+                        peopleTableBody.insertAdjacentHTML('beforeend', row);
+                    });
+
+                    url = response.data.next; // Set to the next page URL
+                }
+            } catch (error) {
+                peopleTableBody.innerHTML = `<tr>
+                    <td colspan="6" style="text-align: center; color: red;">Error loading data. Please try again later.</td>
+                </tr>`;
+                console.error(error);
+            }
+        }
+
+        async function fetchShips() {
+            const shipsTableBody = document.querySelector("#shipsTable tbody");
+            shipsTableBody.innerHTML = ""; // Clear loading state
+
+            try {
+                let url = 'https://swapi.dev/api/starships/';
+                while (url) {
+                    const response = await axios.get(url);
+                    const ships = response.data.results;
+
+                    ships.forEach(ship => {
+                        const row = `<tr>
+                            <td>${ship.name}</td>
+                            <td>${ship.model}</td>
+                            <td>${ship.manufacturer}</td>
+                            <td>${ship.cost_in_credits}</td>
+                            <td>${ship.crew}</td>
+                            <td>${ship.passengers}</td>
+                            <td>${ship.starship_class}</td>
+                        </tr>`;
+                        shipsTableBody.insertAdjacentHTML('beforeend', row);
+                    });
+
+                    url = response.data.next; // Set to the next page URL
+                }
+            } catch (error) {
+                shipsTableBody.innerHTML = `<tr>
+                    <td colspan="7" style="text-align: center; color: red;">Error loading data. Please try again later.</td>
+                </tr>`;
+                console.error(error);
+            }
+        }
+
+        fetchPeople();
+        fetchShips();
+    </script>
+</body>
+</html>
