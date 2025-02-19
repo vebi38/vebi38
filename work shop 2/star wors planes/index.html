@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Star Wars Resources</title>
+  <link rel="stylesheet" href="./assets/app.css" />
+  <header>
+    <!-- Navigation for different resources -->
+    <button class="nav-btn" id="peopleBtn">People</button>
+    <button class="nav-btn" id="shipsBtn">Ships</button>
+    <button class="nav-btn" id="planetsBtn">Planets</button>
+  </header>
+
+  <!-- Landing Page: shows a clickable planet image -->
+  <section id="landingPage">
+    <img
+      src="file:///C:/Users/HP/OneDrive/Desktop/work%20shop%202/star%20wors%20planes/planet.avif"
+      alt="planet"
+      class="planet-image"
+      id="planet"
+    />
+  </section>
+
+  <!-- Content Section -->
+  <section id="content">
+    <div class="spinner" id="spinner"></div>
+    <div id="errorContainer"></div>
+    <div id="tableContainer"></div>
+    <div id="paginationContainer"></div>
+  </section>
+
+  <script>
+    // SWAPI endpoints for different resources
+    const endpoints = {
+      people: 'https://swapi.dev/api/people/',
+      ships: 'https://swapi.dev/api/starships/',
+      planets: 'https://swapi.dev/api/planets/'
+    };
+
+    // DOM elements
+    const spinner = document.getElementById('spinner');
+    const errorContainer = document.getElementById('errorContainer');
+    const tableContainer = document.getElementById('tableContainer');
+    const paginationContainer = document.getElementById('paginationContainer');
+    const landingPage = document.getElementById('landingPage');
+
+    // Spinner controls
+    const showSpinner = () => spinner.style.display = 'block';
+    const hideSpinner = () => spinner.style.display = 'none';
+
+    // Error message display
+    const displayError = (message) => {
+      errorContainer.innerHTML = `<div class="error">${message}</div>`;
+      tableContainer.innerHTML = '';
+      paginationContainer.innerHTML = '';
+    };
+    const clearError = () => errorContainer.innerHTML = '';
+
+    // Higher order functions to generate table header and rows
+    const generateTableHeader = (resource) => {
+      let headers;
+      if (resource === 'planets') {
+        headers = ['Planet Name', 'Population', 'Climate', 'Gravity', 'Terrain'];
+      } else if (resource === 'people') {
+        headers = ['Name', 'Height', 'Mass', 'Birth Year', 'Gender'];
+      } else if (resource === 'ships') {
+        headers = ['Name', 'Model', 'Manufacturer', 'Cost', 'Crew'];
+      }
+      return `<tr>${headers.map(header => `<th>${header}</th>`).join('')}</tr>`;
+    };
+
+    const generateTableRows = (data, resource) => {
+      let keys;
+      if (resource === 'planets') {
+        keys = ['name', 'population', 'climate', 'gravity', 'terrain'];
+      } else if (resource === 'people') {
+        keys = ['name', 'height', 'mass', 'birth_year', 'gender'];
+      } else if (resource === 'ships') {
+        keys = ['name', 'model', 'manufacturer', 'cost_in_credits', 'crew'];
+      }
+      return data
+        .map(item => {
+          const row = keys.map(key => `<td>${item[key] || 'N/A'}</td>`).join('');
+          return `<tr>${row}</tr>`;
+        })
+        .join('');
+    };
+
+    // Async function to fetch data using async/await
+    const fetchResourceData = async (url) => {
+      try {
+        clearError();
+        showSpinner();
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Server error');
+        }
+        const data = await response.json();
+        hideSpinner();
+        return data;
+      } catch (error) {
+        hideSpinner();
+        displayError('Something went wrong. Please try again later.');
+        console.error(error);
+        return null;
+      }
+    };
+
+    // Function to render table and pagination controls
+    const renderTable = (data, resource) => {
+      if (!data) return;
+      const tableHTML = `
+        <table>
+          <thead>
+            ${generateTableHeader(resource)}
+          </thead>
+          <tbody>
+            ${generateTableRows(data.results, resource)}
+          </tbody>
+        </table>
+      `;
+      tableContainer.innerHTML = tableHTML;
+
+      // Render pagination buttons if available
+      const paginationHTML = `
+        <button ${!data.previous ? 'disabled' : ''} id="prevBtn">Previous</button>
+        <button ${!data.next ? 'disabled' : ''} id="nextBtn">Next</button>
+      `;
+      paginationContainer.innerHTML = paginationHTML;
+
+      // Attach event listeners using arrow functions
+      if (data.previous) {
+        document.getElementById('prevBtn').addEventListener('click', () => {
+          loadResource(resource, data.previous);
+        });
+      }
+      if (data.next) {
+        document.getElementById('nextBtn').addEventListener('click', () => {
+          loadResource(resource, data.next);
+        });
+      }
+    };
+
+    // Main function to load a given resource; defaults to the first page endpoint if no URL provided
+    const loadResource = async (resource, url = endpoints[resource]) => {
+      landingPage.style.display = 'none'; // hide landing page once a resource is loaded
+      const data = await fetchResourceData(url);
+      if (data) {
+        renderTable(data, resource);
+      }
+    };
+
+    // Event listeners for navigation buttons
+    document.getElementById('peopleBtn').addEventListener('click', () => loadResource('people'));
+    document.getElementById('shipsBtn').addEventListener('click', () => loadResource('ships'));
+    document.getElementById('planetsBtn').addEventListener('click', () => loadResource('planets'));
+
+    // Click on the planet image on the landing page to load planets data
+    document.getElementById('planetImage').addEventListener('click', () => loadResource('planets'));
+  </script>
+</body>
+</html>
+</head>
+<body>
