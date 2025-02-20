@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>CountrySearch</title>
+</head>
+<body>
+    <img
+      src="https://static.guim.co.uk/sys-images/Guardian/Pix/pictures/2011/1/12/1294859657274/Earth-007.jpg"
+      alt="world"
+      class="world-image"
+      id="world">
+    <header>
+        <h1>Country Search</h1>
+        <input type="text" id="search-input" placeholder="Enter country name">
+        <button id="search-button">Search</button>
+        <div id="extra-buttons">
+            <button id="get-europe">Get All Countries in Europe</button>
+            <button id="get-neighbors">Get Neighbors of Macedonia</button>
+            <button id="get-macedonia">Get Macedonia</button>
+        </div>
+    </header>
+    <main>
+        <div id="loading" class="hidden">Loading...</div>
+        <div id="countries-container"></div>
+        <div id="no-results" class="hidden">Country Not Found</div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

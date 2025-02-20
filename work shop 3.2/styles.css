@@ -1,0 +1,35 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+header {
+    margin-bottom: 20px;
+}
+
+#countries-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.country-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px;
+    width: 200px;
+    text-align: center;
+    background-color: #fff;
+}
+
+.hidden {
+    display: none;
+}
+
+#loading {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
